@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eaux Sauvages</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body, html {
+            height: 100vh;
+            overflow: hidden; /* Prevent scrolling */
+        }
+
+        .background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background-size: cover; /* Maintain aspect ratio */
+            background-position: center;
+            background-repeat: no-repeat;
+            z-index: -1;
+        }
+
+        .nav-container {
+            position: absolute;
+            top: 2vh;
+            left: 0;
+            width: 100vw; /* Take up the entire row */
+            transform: none; /* Remove centering transform */
+            display: flex;
+            gap: 0; /* Remove gap, handled by flex */
+            padding: 1vh 0;
+            justify-content: space-evenly; /* Evenly distribute links */
+        }
+
+        .nav-link {
+            flex: 1 1 0;
+            display: flex;                /* Add this */
+            align-items: center;          /* Vertically center text */
+            justify-content: center;      /* Horizontally center text */
+            text-align: center;
+            text-decoration: none;
+            color: white;
+            /* font-family: Arial, sans-serif;  <-- 删除或注释掉这一行 */
+            font-weight: bold;
+            font-size: 2vw; /* Scales with viewport width */
+            line-height: 2.5vw; /* 与 font-size 接近或略大 */
+            position: relative;
+            background: transparent;
+            padding: 0.5vh 1vw; /* Relative padding */
+            transition: background-color 0.3s ease; /* Smooth hover transition */
+        }
+
+        .nav-link:hover {
+            background-color: var(--nav-hover-bg, rgba(255,255,255,0.2));
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%); /* Center underline */
+            bottom: -0.2vh;
+            width: calc(100% + 1em); /* Underline extends one word length */
+            height: 0.2vh; /* Thin underline, scales with viewport */
+            background-color: var(--nav-underline-color, white); /* 使用CSS变量，默认白色 */
+        }
+
+        /* Tablet (iPad, 481px–1024px) */
+        @media screen and (max-width: 1024px) {
+            .nav-container {
+                gap: 3vw; /* Slightly larger gap for tablets */
+            }
+            .nav-link {
+                font-size: 3vw; /* Larger text for tablet readability */
+                padding: 0.7vh 1.5vw;
+            }
+        }
+
+        /* Mobile (≤480px) */
+        @media screen and (max-width: 480px) {
+            .nav-container {
+                flex-direction: column; /* Stack links vertically */
+                align-items: center;
+                gap: 3vh; /* Vertical spacing */
+                top: 5vh; /* More top margin for smaller screens */
+            }
+            .nav-link {
+                font-size: 4vw; /* Larger text for mobile readability */
+                padding: 1vh 2vw;
+            }
+        }
+
+        /* Dynamically loaded fonts */
+        @font-face {
+            font-family: 'Bolin Gerii';
+            src: url('fonts/Bolin Gerii.woff2') format('woff2');
+        }
+        @font-face {
+            font-family: 'Chamberi Super Display';
+            src: url('fonts/Chamberi Super Display.woff2') format('woff2');
+        }
+        @font-face {
+            font-family: 'Clesgoth-Engraved';
+            src: url('fonts/Clesgoth-Engraved.woff2') format('woff2');
+        }
+        @font-face {
+            font-family: 'Felix Titling';
+            src: url('fonts/Felix Titling.woff2') format('woff2');
+        }
+        @font-face {
+            font-family: 'Lovelo Line Light';
+            src: url('fonts/Lovelo Line Light.woff2') format('woff2');
+        }
+        @font-face {
+            font-family: 'masker';
+            src: url('fonts/masker.woff2') format('woff2');
+        }
+        @font-face {
+            font-family: 'VCR_OSD_MONO_1.001';
+            src: url('fonts/VCR_OSD_MONO_1.001.woff2') format('woff2');
+        }
+        @font-face {
+            font-family: 'karlotte';
+            src: url('fonts/karlotte.woff2') format('woff2');
+        }
+        @font-face {
+            font-family: 'Zen Maru Gothic';
+            src: url('fonts-3/Zen Maru Gothic.woff2') format('woff2');
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'Tsukuhou Shogo Mincho OFL H';
+            src: url('fonts-3/Tsukuhou Shogo Mincho OFL H.ttf') format('truetype');
+            font-display: swap;
+        }
+        @font-face {
+            font-family: '07ReallyScaryMinchotai';
+            src: url('fonts-3/07ReallyScaryMinchotai.woff2') format('woff2');
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'GL-CurulMinamoto Light';
+            src: url('fonts-3/GL-CurulMinamoto Light.woff2') format('woff2');
+            font-display: swap;
+        }
+
+        .centered-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 8vw;
+            color: white;
+            text-align: center;
+            z-index: 10;
+            font-family: 'Font1', sans-serif; /* Default, will be overridden by JS */
+            text-shadow: 0 2px 16px rgba(0,0,0,0.35);
+            pointer-events: none;
+            user-select: none;
+            white-space: nowrap; /* 保证始终单行显示 */
+        }
+
+        .corner-logo {
+            position: fixed;
+            right: 2vw;
+            bottom: 2vh;
+            color: #fff;
+            font-size: 1.2vw;
+            opacity: 0.5;
+            font-family: 'Felix Titling', serif;
+            z-index: 20;
+            pointer-events: none;
+            user-select: none;
+            text-shadow: 0 1px 8px #000;
+        }
+    </style>
+</head>
+<body>
+    <div class="background"></div>
+    <nav class="nav-container" id="navContainer">
+        <a href="/notheme" class="nav-link">Unfocused thoughts</a>
+        <a href="/theme" class="nav-link">Paragraphes avec thèmes</a>
+        <a href="/envelope" class="nav-link">Umschlag</a>
+        <a href="/portfolio" class="nav-link">ポートフォリオ</a>
+    </nav>
+    <div class="centered-text" id="centeredText">Eaux Sauvages</div>
+    <div class="corner-logo">© Eaux Sauvages</div>
+    <script>
+        // Tableau des noms de fichiers d'images dans le répertoire images/
+        const images = [
+            'RainbowRiverSplash.png',       
+            'RainbowRiverBrush.png',     
+            'RainbowRiverGlow.png',   
+            'ShetlandGannetsSplash.png',    
+            'ShetlandGannetsBrush.png',  
+            'ShetlandGannetsGlow.png',
+        ];
+
+        // Sélectionner une image au hasard
+        const randomImage = images[Math.floor(Math.random() * images.length)];
+
+        // Définir dynamiquement l'image de fond
+        document.querySelector('.background').style.backgroundImage = `url('images/${randomImage}')`;
+
+        // Liste des familles de polices (doit correspondre aux noms dans @font-face)
+        const fontFamilies = [
+            'Bolin Gerii',
+            'Chamberi Super Display',
+            'Clesgoth-Engraved',
+            'Felix Titling',
+            'Lovelo Line Light',
+            'masker',
+            'VCR_OSD_MONO_1.001',
+            'karlotte'
+        ];
+
+        // Choisir une police au hasard
+        const randomFont = fontFamilies[Math.floor(Math.random() * fontFamilies.length)];
+
+        // Appliquer la police au texte centré
+        document.getElementById('centeredText').style.fontFamily = `'${randomFont}', sans-serif`;
+
+        // Facultatif : définir ici le texte souhaité
+        document.getElementById('centeredText').textContent = "Eaux Sauvages";
+
+        // Liste des polices pour la barre de navigation
+        const navFonts = [
+            'Zen Maru Gothic',
+            'Tsukuhou Shogo Mincho OFL H',
+            '07ReallyScaryMinchotai',
+            'GL-CurulMinamoto Light'
+        ];
+        // Choisir une police de navigation au hasard
+        const randomNavFont = navFonts[Math.floor(Math.random() * navFonts.length)];
+
+        // Appliquer à chaque lien la police et la taille
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.style.fontFamily = `"${randomNavFont}", sans-serif`;
+            if (randomNavFont === 'Zen Maru Gothic') {
+                link.style.fontSize = '2vw';
+            } else {
+                link.style.fontSize = '1.8vw'; // Vous pouvez ajuster selon l'effet souhaité
+            }
+        });
+
+        // Obtenir la couleur principale de l'image de fond et ajuster la couleur du texte et du soulignement
+        function setNavTextColorByBg(imagePath) {
+            const img = new Image();
+            img.crossOrigin = "Anonymous";
+            img.src = imagePath;
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                canvas.width = 1;
+                canvas.height = 1;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, 1, 1);
+                const [r, g, b] = ctx.getImageData(0, 0, 1, 1).data;
+                const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+                const color = brightness > 186 ? '#222' : '#fff';
+                const hoverBg = brightness > 186
+                    ? 'rgba(0,0,0,0.12)'   // Si le fond est clair, utiliser un fond foncé semi-transparent
+                    : 'rgba(255,255,255,0.2)'; // Si le fond est foncé, utiliser un fond clair semi-transparent
+                document.querySelectorAll('.nav-link').forEach(link => {
+                    link.style.color = color;
+                    link.style.setProperty('--nav-underline-color', color);
+                    link.style.setProperty('--nav-hover-bg', hoverBg);
+                });
+            };
+        }
+
+        // Utiliser le chemin de l'image de fond actuelle
+        const bgImage = `images/${randomImage}`;
+        setNavTextColorByBg(bgImage);
+    </script>
+</body>
+</html>
